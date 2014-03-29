@@ -1,11 +1,11 @@
 package com.hackduke.hackduke14;
 
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,15 +13,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ToggleButton;
-import android.os.Build;
 import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 
 public class MainScreen extends ActionBarActivity {
 
     private static final int BUTTON_POSITIVE = -1;
     final Context context = this;
- 
+    public SpeechRecognizer speech;
+    public Intent recognitionIntent;
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,8 @@ public class MainScreen extends ActionBarActivity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
-        
+        // This is my own code:
+        initSpeech();
     }
 
 
@@ -62,8 +64,11 @@ public class MainScreen extends ActionBarActivity {
      */
     
     
-    public SpeechRecognizer initSpeech() {
-    	SpeechRecognizer speech = SpeechRecognizer.createSpeechRecognizer(context);
+    public void initSpeech() {
+    	speech = SpeechRecognizer.createSpeechRecognizer(context);
+    	recognitionIntent  = new Intent(RecognizerIntent.ACTION_VOICE_SEARCH_HANDS_FREE);
+        //recognitionIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+        //						   RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         speech.setRecognitionListener(new RecognitionListener() {
         	@Override
         	public void onResults(Bundle results) {
@@ -75,7 +80,6 @@ public class MainScreen extends ActionBarActivity {
         	}
 			@Override
 			public void onBeginningOfSpeech() {
-				// TODO Auto-generated method stub
 				showMessage("Start of Speech");
 			}
 			@Override
@@ -109,14 +113,13 @@ public class MainScreen extends ActionBarActivity {
 				
 			}
         });
-        return speech;
     }
     
     public void onSwitchCCClicked(View view) {
         if(((ToggleButton) view).isChecked()) {
-            
+            speech.startListening(recognitionIntent);
         } else {
-           showMessage("Switched Off");
+           speech.stopListening();
         }  
     }
     public void showMessage(String message) {
@@ -144,7 +147,7 @@ public class MainScreen extends ActionBarActivity {
 		alertDialog.show();
     }
     
-    public SpeechRecognizer speech = initSpeech();
+    
     
     
     public static class PlaceholderFragment extends Fragment {
