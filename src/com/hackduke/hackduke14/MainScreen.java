@@ -1,17 +1,22 @@
 package com.hackduke.hackduke14;
 
+import java.util.ArrayList;
+
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -64,14 +69,14 @@ public class MainScreen extends ActionBarActivity {
      */
     
     
-    public void initSpeech() {
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN) public void initSpeech() {
     	speech = SpeechRecognizer.createSpeechRecognizer(context);
     	recognitionIntent  = new Intent(RecognizerIntent.ACTION_VOICE_SEARCH_HANDS_FREE);
-        //recognitionIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-        //						   RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        recognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS,true);
         speech.setRecognitionListener(new RecognitionListener() {
         	@Override
         	public void onResults(Bundle results) {
+        		//showMessage("results");
         		
         	}
         	@Override
@@ -80,36 +85,45 @@ public class MainScreen extends ActionBarActivity {
         	}
 			@Override
 			public void onBeginningOfSpeech() {
-				showMessage("Start of Speech");
+				//showMessage("Start of Speech");
 			}
 			@Override
 			public void onBufferReceived(byte[] buffer) {
-				// TODO Auto-generated method stub
+				//showMessage("buffer received");
 				
 			}
 			@Override
 			public void onError(int error) {
-				// TODO Auto-generated method stub
+				//showMessage(Integer.toString(error));
 				
 			}
 			@Override
 			public void onEvent(int eventType, Bundle params) {
-				// TODO Auto-generated method stub
+				//showMessage("onevent");
 				
 			}
 			@Override
 			public void onPartialResults(Bundle partialResults) {
-				// TODO Auto-generated method stub
-				
+				ArrayList<String> something = partialResults.getStringArrayList("results_recognition");
+				TextView basicText = (TextView)findViewById(R.id.basicText1);
+				for (int i=0;i<something.size();i++) {
+        			//showMessage(something.get(i));
+        			
+        			basicText.append(something.get(i));
+        			basicText.append(" ");
+        		}
+				if (something.size() > 0) {
+					basicText.setText(something.get(0));
+				}
 			}
 			@Override
 			public void onReadyForSpeech(Bundle params) {
-				// TODO Auto-generated method stub
+				//showMessage("ready for speech");
 				
 			}
 			@Override
 			public void onRmsChanged(float rmsdB) {
-				// TODO Auto-generated method stub
+				//showMessage("rms changed");
 				
 			}
         });
